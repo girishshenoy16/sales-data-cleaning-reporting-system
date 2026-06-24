@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QSales — Sales Ledger FY25–26</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="loading-overlay" id="loading-overlay">
+  <div class="loading-box">
+    <div class="loading-spinner"></div>
+    <span class="loading-text" id="loading-text">Loading 21,516 cube rows…</span>
+  </div>
+</div>
+
+<!-- LEFT RAIL -->
+<nav class="rail">
+  <div class="rail-brand">
+    <span class="rail-brand-mark">Q</span>
+    <div class="rail-brand-text">
+      <strong>QSales</strong>
+      <small>Sales Ledger</small>
+    </div>
+  </div>
+
+  <div class="rail-section" data-target="sec-cover">
+    <span class="rail-num">Cover</span>
+    <span class="rail-label">The Headline</span>
+  </div>
+  <div class="rail-section" data-target="sec-revenue">
+    <span class="rail-num">I.</span>
+    <span class="rail-label">Revenue &amp; Margin</span>
+  </div>
+  <div class="rail-section" data-target="sec-geo">
+    <span class="rail-num">II.</span>
+    <span class="rail-label">Geography &amp; SKUs</span>
+  </div>
+  <div class="rail-section" data-target="sec-anomaly">
+    <span class="rail-num">III.</span>
+    <span class="rail-label">The Anomaly</span>
+  </div>
+  <div class="rail-section" data-target="sec-team">
+    <span class="rail-num">IV.</span>
+    <span class="rail-label">Team &amp; Customers</span>
+  </div>
+
+  <div class="rail-filters">
+    <span class="rail-filters-title">Filter the ledger</span>
+    <select id="f-region"><option value="">Region</option><option>East</option><option>North</option><option>South</option><option>West</option></select>
+    <select id="f-cat"><option value="">Category</option><option>Technology</option><option>Furniture</option><option>Office Supplies</option></select>
+    <select id="f-rep"><option value="">Sales Representative</option><option>Emma Wilson</option><option>Alice Smith</option><option>Frank Thomas</option><option>Charlie Brown</option><option>David Miller</option><option>Bob Jones</option></select>
+    <select id="f-status"><option value="">Status</option><option>Delivered</option><option>Shipped</option><option>Pending</option><option>Cancelled</option></select>
+    <select id="f-payment"><option value="">Payment</option><option>Bank Transfer</option><option>Credit Card</option><option>Debit Card</option><option>PayPal</option><option>Unspecified</option></select>
+    <button id="reset-btn">Clear filters</button>
+    <span class="rail-filter-meta" id="filter-meta"></span>
+  </div>
+</nav>
+
+<!-- MAIN SCROLL CANVAS -->
+<main class="canvas">
+
+  <!-- COVER -->
+  <section class="sheet cover" id="sec-cover">
+    <div class="cover-eyebrow">FY 2025 – FY 2026 (PARTIAL) · <span id="stat-orders">105,000</span> ORDERS LOGGED</div>
+    <h1 class="cover-headline">Four ways out of every order.<br>Each one happens <em>exactly</em> a quarter of the time.</h1>
+    <p class="cover-sub">That's not a typical retail funnel — it's a coin flip, repeated four ways, 105,000 times. This ledger walks the CEO and CFO through what's actually driving sales, and why the fulfilment numbers don't look like any real warehouse we've seen.</p>
+    <div class="cover-stats">
+      <div class="cstat"><span class="cstat-val" id="stat-sales">₹28.43 Cr</span><span class="cstat-label">Total sales</span></div>
+      <div class="cstat"><span class="cstat-val" id="stat-profit">₹5.78 Cr</span><span class="cstat-label">Total profit</span></div>
+      <div class="cstat"><span class="cstat-val" id="stat-margin">20.32%</span><span class="cstat-label">Avg margin</span></div>
+      <div class="cstat cstat-flag"><span class="cstat-val" id="stat-cancel">25.16%</span><span class="cstat-label">Cancelled — flagged →</span></div>
+    </div>
+    <div class="cover-scroll-hint" id="filter-status-hint">Scroll for the full ledger ↓</div>
+  </section>
+
+  <!-- I. REVENUE & MARGIN -->
+  <section class="sheet" id="sec-revenue">
+    <header class="sheet-head">
+      <span class="sheet-num">I.</span><h2>Revenue &amp; Margin</h2>
+      <p>The CEO's first question — where does the money come from, and where does it actually stay?</p>
+    </header>
+
+    <div class="row row-2">
+      <article class="card card-wide">
+        <h3>Monthly sales — and where the data thins out</h3>
+        <p class="card-note">Jan 2026 was the peak month at ₹2.02&nbsp;Cr. Everything after May 2026 is a fraction of normal volume — that's an incomplete reporting window, not a demand collapse. Don't draw conclusions past the dotted line.</p>
+        <canvas id="chart-monthly" height="220"></canvas>
+      </article>
+      <article class="card">
+        <h3>Best margin, not best volume</h3>
+        <p class="card-note">Office Supplies is barely 3% of revenue but the only category clearing 35%+ margin.</p>
+        <canvas id="chart-margin-by-cat" height="220"></canvas>
+      </article>
+    </div>
+
+    <div class="row row-2">
+      <article class="card">
+        <h3>Where the revenue actually comes from</h3>
+        <p class="card-note">Technology carries the book. Furniture carries the volume but not the profit.</p>
+        <canvas id="chart-rev-by-cat" height="230"></canvas>
+      </article>
+      <article class="card">
+        <h3>Profit follows a different order than revenue</h3>
+        <p class="card-note">Ranking categories by profit instead of revenue tells a different story than the chart on the left.</p>
+        <canvas id="chart-profit-by-cat" height="230"></canvas>
+      </article>
+    </div>
+
+    <div class="margin-strip">
+      <div class="margin-strip-label">Margin by category, side by side</div>
+      <div class="margin-bars">
+        <div class="mbar-row"><span class="mbar-name">Office Supplies</span><div class="mbar-track"><div class="mbar-fill mbar-good" style="width:37.1%"></div></div><span class="mbar-pct">37.1%</span></div>
+        <div class="mbar-row"><span class="mbar-name">Technology</span><div class="mbar-track"><div class="mbar-fill mbar-mid" style="width:23.1%"></div></div><span class="mbar-pct">23.1%</span></div>
+        <div class="mbar-row"><span class="mbar-name">Furniture</span><div class="mbar-track"><div class="mbar-fill mbar-low" style="width:13.9%"></div></div><span class="mbar-pct">13.9%</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- II. GEOGRAPHY & SKUS -->
+  <section class="sheet" id="sec-geo">
+    <header class="sheet-head">
+      <span class="sheet-num">II.</span>
+      <h2>Geography &amp; SKUs</h2>
+      <p>Where customers are, and whether geography changes anything about how profitable they are.</p>
+    </header>
+
+    <div class="row row-2">
+      <article class="card">
+        <h3>Region split — close to a four-way tie</h3>
+        <p class="card-note">South leads by only ₹47L over East. Margin is flat across all four — geography moves volume here, not profit.</p>
+        <canvas id="chart-region" height="220"></canvas>
+      </article>
+      <article class="card card-wide">
+        <h3>Order volume by region, month over month</h3>
+        <p class="card-note">Tracks whether any single region is driving the overall order-count trend, or whether all four move together.</p>
+        <canvas id="chart-region-trend" height="220"></canvas>
+      </article>
+    </div>
+
+    <div class="row row-2">
+      <article class="card card-wide">
+        <h3>Average order value by category</h3>
+        <p class="card-note">Same totals, viewed per order instead of in aggregate — shows whether Technology's lead is about bigger baskets or more of them.</p>
+        <canvas id="chart-aov-cat" height="200"></canvas>
+      </article>
+      <article class="card">
+        <h3>Payment method mix</h3>
+        <p class="card-note">2,169 orders have no payment method on record — a checkout logging gap, not a customer behaviour.</p>
+        <canvas id="chart-payment" height="200"></canvas>
+      </article>
+    </div>
+  </section>
+
+  <!-- III. THE ANOMALY — SIGNATURE SECTION -->
+  <section class="sheet anomaly-sheet" id="sec-anomaly">
+    <header class="sheet-head sheet-head-dark">
+      <span class="sheet-num">III.</span>
+      <h2>The Anomaly</h2>
+      <p>The one chart in this ledger that should make the CFO pause before reading anything else.</p>
+    </header>
+
+    <br>
+    <div class="swatch-block">
+      <div class="swatch-row" id="swatch-row"></div>
+      <p class="swatch-caption" id="swatch-caption">Four outcomes. Four nearly identical shares. In 105,000 real orders, fulfilment categories almost never land this close to an even split — this pattern is worth investigating at the data-pipeline level before it's treated as a fulfilment crisis.</p>
+    </div>
+
+    <div class="row row-2">
+      <article class="card card-dark">
+        <h3>Is cancellation a regional problem?</h3>
+        <p class="card-note-dark">No region or category stands out — every cell sits within a tight range of every other. The cause sits upstream of geography.</p>
+        <table class="heat-table" id="heat-table"></table>
+      </article>
+      <article class="card card-dark">
+        <h3>What this means for the CFO</h3>
+        <ul class="findings-list" id="findings-list">
+          <li><span>↓</span> 25.16% cancellation is far above the 5–10% retail norm — but it's spread too evenly to be a warehouse or supplier issue.</li>
+          <li><span>★</span> Recommend auditing the order-status pipeline itself before reallocating any fulfilment budget.</li>
+          <li><span>↑</span> If genuine, fixing this single issue could recover roughly ₹7.1 Cr in cancelled-order value.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <!-- IV. TEAM & CUSTOMERS -->
+  <section class="sheet" id="sec-team">
+    <header class="sheet-head">
+      <span class="sheet-num">IV.</span>
+      <h2>Team &amp; Customers</h2>
+      <p>Is performance balanced across the sales floor, or is one person quietly carrying the book?</p>
+    </header>
+
+    <div class="row row-2">
+      <article class="card">
+        <h3>Sales by rep</h3>
+        <p class="card-note">All six within ₹3.8L of each other on ₹4.5Cr+ books each — an unusually even team, no outlier to manage.</p>
+        <canvas id="chart-reps" height="230"></canvas>
+      </article>
+      <article class="card">
+        <h3>Margin by rep — not just who sells more</h3>
+        <p class="card-note">Charlie Brown converts sales to profit slightly better than the top-line leader, Emma Wilson.</p>
+        <canvas id="chart-rep-margin" height="230"></canvas>
+      </article>
+    </div>
+
+    <div class="row row-2">
+      <article class="card card-wide">
+        <h3>Category mix by region</h3>
+        <p class="card-note">Technology dominates every region's basket equally — no region has a distinct category preference to target with localised merchandising.</p>
+        <canvas id="chart-region-cat" height="220"></canvas>
+      </article>
+      <article class="card stat-card">
+        <h3>At a glance</h3>
+        <div class="stat-card-grid">
+          <div><b id="stat-customers">9,999</b><span>unique customers</span></div>
+          <div><b id="stat-aov">₹2,707.76</b><span>avg order value</span></div>
+          <div><b id="stat-reps">6</b><span>sales reps, balanced</span></div>
+          <div><b id="stat-rows">21,516</b><span>cube rows in view</span></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <footer class="ledger-footer">
+    <p>Sales Data Cleaning &amp; Reporting System — prepared for QSales leadership. Figures sourced from 105,000 cleaned transaction records, Jan 2025–Dec 2026 (partial).</p>
+  </footer>
+
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
